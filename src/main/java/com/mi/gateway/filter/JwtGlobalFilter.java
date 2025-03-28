@@ -25,7 +25,7 @@ public class JwtGlobalFilter implements GlobalFilter {
         String path = exchange.getRequest().getURI().getPath();
 
         //화이트 리스트에 있는 주소는 검증 생략
-        if(Arrays.stream(whiteListPath.getWhiteList()).anyMatch(whiteList -> whiteList.matches(path))) {
+        if(path.matches("/users")) {
             return chain.filter(exchange);
         }
 

@@ -1,6 +1,7 @@
 package com.mi.gateway.config;
 
 import com.mi.gateway.common.WhiteListPath;
+import com.mi.gateway.security.CustomAuthenticationEntryPoint;
 import com.mi.gateway.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,7 +22,7 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final WhiteListPath whiteListPath;
-    private final ServerAuthenticationEntryPoint authenticationEntryPoint; // 인증 실패
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint; // 인증 실패
 
     @Qualifier("blacklistRedisTemplate")
     private final RedisTemplate<String, Object> blacklistRedisTemplate;
