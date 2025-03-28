@@ -7,11 +7,13 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 
 
 @Component
@@ -59,18 +61,19 @@ public class JwtTokenProvider {
                 .getBody();  // Claims (페이로드) 반환
     }
 
-    // 향후 시큐리티 도입 확정시 사용.
-//    public Authentication getAuthentication(String token) {
-//        byte[] keyBytes = jwtConfig.getSecretKey().getBytes(StandardCharsets.UTF_8);
-//        Claims claims = Jwts.parserBuilder()
-//                .setSigningKey(new SecretKeySpec(keyBytes, "HmacSHA256"))  // 서명 검증을 위한 키 설정
-//                .build()
-//                .parseClaimsJws(token).getBody();
-//        String username = claims.getSubject();
-//        String role = claims.get("role", String.class);
-//
-//        // Board 서버에서는 UserDetailsService 없이 직접 UserDetails 생성
-//        CustomUserDetails userDetails = new CustomUserDetails(username, role);
-//        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-//    }
+    public Authentication getAuthentication(String token) {
+        byte[] keyBytes = jwtConfig.getSecretKey().getBytes(StandardCharsets.UTF_8);
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(new SecretKeySpec(keyBytes, "HmacSHA256"))  // 서명 검증을 위한 키 설정
+                .build()
+                .parseClaimsJws(token).getBody();
+        String username = claims.getSubject();
+        String role = claims.get("role", String.class);
+
+// 🔽 role 문자열을 권한 리스트로 변환
+        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+        // Board 서버에서는 UserDetailsService 없이 직접 UserDetails 생성
+        return new UsernamePasswordAuthenticationToken(username, "", authorities);
+    }
 }

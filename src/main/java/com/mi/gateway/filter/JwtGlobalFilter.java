@@ -1,5 +1,6 @@
 package com.mi.gateway.filter;
 
+import com.mi.gateway.common.WhiteListPath;
 import com.mi.gateway.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -10,17 +11,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
+
 @Component
 @RequiredArgsConstructor
 public class JwtGlobalFilter implements GlobalFilter {
     private final JwtTokenProvider tokenProvider;
+    private final WhiteListPath whiteListPath;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         String path = exchange.getRequest().getURI().getPath();
 
-        //로그인에 대해서는 검증생략.
-        if(path.equals("/api/auth/login")) {
+        //화이트 리스트에 있는 주소는 검증 생략
+        if(Arrays.stream(whiteListPath.getWhiteList()).anyMatch(whiteList -> whiteList.matches(path))) {
             return chain.filter(exchange);
         }
 
