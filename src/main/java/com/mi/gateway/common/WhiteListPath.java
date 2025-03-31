@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class WhiteListPath {
 
     public final String[] whiteList = {
-            "/users/*",
+            "/users/api/auth/login",
     };
 
 
