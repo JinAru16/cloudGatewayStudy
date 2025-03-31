@@ -21,7 +21,7 @@ public class SecurityConfig {
     private final JwtSecurityContextRepository securityContextRepository;
 
     @Qualifier("blacklistRedisTemplate")
-    private final RedisTemplate<String, Object> blacklistRedisTemplate;
+    private final RedisTemplate<String, Object> blacklistRedisTemplate;// 추후 설정.
 
 
 
