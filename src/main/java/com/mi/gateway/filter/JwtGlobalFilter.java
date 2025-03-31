@@ -47,21 +47,14 @@ public class JwtGlobalFilter implements GlobalFilter {
             String username = tokenProvider.getUsername(httpCookie.getValue());
             String role = tokenProvider.getRole(httpCookie.getValue());
 
-            // 인증 객체 생성
-            Authentication auth = new UsernamePasswordAuthenticationToken(
-                    username,
-                    null,
-                    List.of(new SimpleGrantedAuthority(role))
-            );
-
             tokenProvider.getUsername(httpCookie.getValue());
             exchange.getRequest().mutate()
                     .header("X-Auth-ID", username)
+                    .header("X-Auth-Role", role)
                     .build();
 
-            // SecurityContext 설정
-            return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+            return chain.filter(exchange);
+
         } else{
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
