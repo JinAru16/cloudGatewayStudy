@@ -7,6 +7,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.RequestPath;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,13 +32,17 @@ public class JwtGlobalFilter implements GlobalFilter {
 
         String path = exchange.getRequest().getURI().getRawPath();
 
-        // 화이트리스트 패스
-        if (Arrays.stream(whiteListPath.getWhiteList()).anyMatch(path::matches)) {
+           /*
+            * 게이트웨이서  이미 분기가 된 이후기때문에 Predicate가 제거된 whiteListPath를 사용.
+            * ex /users/api/auth/login -> /api/auth/login
+            * */
+        if (Arrays.stream(whiteListPath.getStrippedWhiteList()).anyMatch(path::matches)) {
             return chain.filter(exchange);
         }
 
         HttpCookie httpCookie = extractToken(exchange);
 
+        // 토큰이 유효하면 SecurityContext의 인증정보를 주입.  -> 인증된 사용자 처리.
         if(httpCookie != null &&  tokenProvider.validateToken(httpCookie.getValue())){
             String username = tokenProvider.getUsername(httpCookie.getValue());
             String role = tokenProvider.getRole(httpCookie.getValue());
