@@ -15,9 +15,6 @@ public class WhiteListPath {
 
     // StripPrefix 이후 기준 (GlobalFilter용)
     private final String[] strippedWhiteList = Arrays.stream(whiteList)
-            .map(path -> path.replaceFirst("^/users", ""))
+            .map(path -> path.replaceFirst("^/[^/]+", ""))
             .toArray(String[]::new);
-
-
-
 }

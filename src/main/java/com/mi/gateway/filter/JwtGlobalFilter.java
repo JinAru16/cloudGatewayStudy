@@ -6,18 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.RequestPath;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.List;
 /*
 * jwt 종류, 사용자의 권한에 따라 endPoint 접근제한.
 * */
@@ -31,8 +27,9 @@ public class JwtGlobalFilter implements GlobalFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         String path = exchange.getRequest().getURI().getRawPath();
+        HttpMethod method = exchange.getRequest().getMethod();// GET, POST 등
 
-           /*
+        /*
             * 게이트웨이서  이미 분기가 된 이후기때문에 Predicate가 제거된 whiteListPath를 사용.
             * ex /users/api/auth/login -> /api/auth/login
             * */
@@ -48,12 +45,16 @@ public class JwtGlobalFilter implements GlobalFilter {
             String role = tokenProvider.getRole(httpCookie.getValue());
 
             tokenProvider.getUsername(httpCookie.getValue());
-            exchange.getRequest().mutate()
+            ServerHttpRequest addHeader = exchange.getRequest().mutate()
                     .header("X-Auth-ID", username)
                     .header("X-Auth-Role", role)
                     .build();
 
-            return chain.filter(exchange);
+            ServerWebExchange mutatedExchange = exchange.mutate()
+                    .request(addHeader)
+                    .build();
+
+            return chain.filter(mutatedExchange);
 
         } else{
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

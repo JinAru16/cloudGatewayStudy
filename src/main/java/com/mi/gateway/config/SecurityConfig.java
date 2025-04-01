@@ -23,8 +23,6 @@ public class SecurityConfig {
     @Qualifier("blacklistRedisTemplate")
     private final RedisTemplate<String, Object> blacklistRedisTemplate;// 추후 설정.
 
-
-
     @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         return http
