@@ -44,17 +44,15 @@ public class JwtGlobalFilter implements GlobalFilter {
             String username = tokenProvider.getUsername(httpCookie.getValue());
             String role = tokenProvider.getRole(httpCookie.getValue());
 
-            tokenProvider.getUsername(httpCookie.getValue());
-            ServerHttpRequest addHeader = exchange.getRequest().mutate()
-                    .header("X-Auth-ID", username)
-                    .header("X-Auth-Role", role)
-                    .build();
+            ServerWebExchange updatedExchange = exchange.mutate()
+                    .request(
+                            exchange.getRequest().mutate()
+                                    .header("X-Auth-ID", username)
+                                    .header("X-Auth-Role", role)
+                                    .build()
+                    ).build();
 
-            ServerWebExchange mutatedExchange = exchange.mutate()
-                    .request(addHeader)
-                    .build();
-
-            return chain.filter(mutatedExchange);
+            return chain.filter(updatedExchange);
 
         } else{
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
