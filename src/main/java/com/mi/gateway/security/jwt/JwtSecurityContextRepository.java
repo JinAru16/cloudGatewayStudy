@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -25,7 +26,11 @@ public class JwtSecurityContextRepository implements ServerSecurityContextReposi
         if (token == null) return Mono.empty();
 
         Authentication auth = new UsernamePasswordAuthenticationToken(null, token);
-        return authenticationManager.authenticate(auth).map(SecurityContextImpl::new);
+
+        return authenticationManager.authenticate(auth)
+                .map(SecurityContextImpl::new)
+                .cast(SecurityContext.class) ;// ⬅️ 여기가 핵심
+                //.onErrorResume(AuthenticationException.class, e -> Mono.empty());
     }
 
     @Override

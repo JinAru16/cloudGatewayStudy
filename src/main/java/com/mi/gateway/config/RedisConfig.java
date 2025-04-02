@@ -31,20 +31,11 @@ public class RedisConfig {
     @Value("${spring.data.redis.auth.database}")
     private int authRedisIndex;
 
-    @Value("${spring.data.redis.board.database}")
-    private int boardRedisIndex;
-
     @Value("${spring.data.redis.auth.host}")
     private String authRedisHost;
 
     @Value("${spring.data.redis.auth.port}")
     private int authRedisPort;
-
-    @Value("${spring.data.redis.board.host}")
-    private String boardRedisHost;
-
-    @Value("${spring.data.redis.board.port}")
-    private int boardRedisPort;
 
     // ✅ [1] 블랙리스트 검증용 Redis ConnectionFactory
     @Bean(name = "authRedisConnectionFactory")
@@ -52,13 +43,6 @@ public class RedisConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(authRedisHost, authRedisPort);
         config.setDatabase(authRedisIndex);
         return new LettuceConnectionFactory(config);
-    }
-
-    // ✅ [3] 기본 `redisTemplate` 빈 추가 (authRedisConnectionFactory 사용)
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(
-            @Qualifier("authRedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
-        return createRedisTemplate(redisConnectionFactory);
     }
 
     // ✅ [4] 블랙리스트 검증용 RedisTemplate
