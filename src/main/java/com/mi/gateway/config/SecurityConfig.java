@@ -20,8 +20,6 @@ public class SecurityConfig {
     private final JwtAuthenticationManager authenticationManager;
     private final JwtSecurityContextRepository securityContextRepository;
 
-    @Qualifier("blacklistRedisTemplate")
-    private final RedisTemplate<String, Object> blacklistRedisTemplate;// 추후 설정.
 
     @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {

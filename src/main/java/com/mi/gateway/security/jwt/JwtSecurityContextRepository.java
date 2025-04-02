@@ -23,14 +23,15 @@ public class JwtSecurityContextRepository implements ServerSecurityContextReposi
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
         String token = extractToken(exchange);
-        if (token == null) return Mono.empty();
+        if (token == null) {
+            return Mono.empty();
+        }
 
         Authentication auth = new UsernamePasswordAuthenticationToken(null, token);
 
         return authenticationManager.authenticate(auth)
                 .map(SecurityContextImpl::new)
                 .cast(SecurityContext.class) ;// ⬅️ 여기가 핵심
-                //.onErrorResume(AuthenticationException.class, e -> Mono.empty());
     }
 
     @Override
