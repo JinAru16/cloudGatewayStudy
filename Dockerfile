@@ -1,4 +1,4 @@
-FROM openjdk:23
+FROM openjdk:21
 WORKDIR /app
 
 # 2️⃣ JAR 파일 복사
