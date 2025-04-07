@@ -21,6 +21,7 @@ public class JwtConfig {
 
     @PostConstruct
     public void init() {
+
         this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 }
