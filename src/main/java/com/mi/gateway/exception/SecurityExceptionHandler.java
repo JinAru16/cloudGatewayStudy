@@ -16,7 +16,7 @@ public class SecurityExceptionHandler implements ErrorWebExceptionHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         // 여기서 필터 단계에서 발생한 예외를 캐치
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         String message = "예상치 못한 에러가 발생했습니다.";
 
         if (ex instanceof CustomTokenException) {
